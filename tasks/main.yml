@@ -1,0 +1,42 @@
+---
+- name: PGBouncer | Install from apt repo
+  apt:
+    name: pgbouncer
+    state: installed
+
+- name: PGBouncer | Install postgresql-client
+  apt:
+    name: postgresql-client
+    state: installed
+  when: pgbouncer_install_pg_client == True
+
+- name: PGBouncer | Backup config
+  command: mv {{ pgbouncer_conf_file }} {{ pgbouncer_conf_file }}.bak
+  ignore_errors: yes
+
+- name: PGBouncer | Configure pgbouncer
+  template:
+    src: ../templates/pgbouncer.ini.j2
+    dest: "{{ pgbouncer_conf_file }}"
+
+- name: PGBouncer | Backup auth users file
+  command: mv {{ pgbouncer_auth_file }} {{ pgbouncer_auth_file }}.bak
+  ignore_errors: yes
+
+- name: PGBouncer | Configure auth_users list
+  template:
+    src: ../templates/userlist.txt.j2
+    dest: "{{ pgbouncer_auth_file }}"
+
+- name: PGBouncer | Configure pgbouncer to start at boot
+  replace:
+    regexp: '^START=0'
+    replace: 'START=1'
+    dest: /etc/default/pgbouncer
+  when: pgbouncer_start_on_boot == True
+
+- name: PGBouncer | (re)Start pgbouncer service
+  service:
+    name: pgbouncer
+    state: restarted
+
