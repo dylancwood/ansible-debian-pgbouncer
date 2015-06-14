@@ -36,9 +36,20 @@ Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
+    - hosts: postgres-databases
+      vars:
+        pgbouncer_database_aliases:
+          - name: mydb
+            host: 127.0.0.1
+            pool_size: 50
+            user: my_app
+        pgbouncer_auth_users:
+          - name: my_app
+            pass: md52093480239932090==
+        pgbouncer_install_pg_client: False
+        pgbouncer_auth_type: md5
       roles:
-         - { role: username.rolename, x: 42 }
+         - { role: dylancwood.debian-pgbouncer}
 
 License
 -------
