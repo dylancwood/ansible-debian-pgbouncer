@@ -10,23 +10,21 @@
     state: installed
   when: pgbouncer_install_pg_client == True
 
-- name: PGBouncer | Backup config
-  command: mv {{ pgbouncer_conf_file }} {{ pgbouncer_conf_file }}.bak
-  ignore_errors: yes
-
 - name: PGBouncer | Configure pgbouncer
   template:
     src: ../templates/pgbouncer.ini.j2
     dest: "{{ pgbouncer_conf_file }}"
-
-- name: PGBouncer | Backup auth users file
-  command: mv {{ pgbouncer_auth_file }} {{ pgbouncer_auth_file }}.bak
-  ignore_errors: yes
+  register: pgbouncer_conf_changed
+  tags:
+    - deploy
 
 - name: PGBouncer | Configure auth_users list
   template:
     src: ../templates/userlist.txt.j2
     dest: "{{ pgbouncer_auth_file }}"
+  register: pgbouncer_auth_changed
+  tags:
+    - deploy
 
 - name: PGBouncer | Configure pgbouncer to start at boot
   replace:
@@ -40,3 +38,18 @@
     name: pgbouncer
     state: restarted
 
+- name: PGBouncer | Start pgbouncer service
+  service:
+    name: pgbouncer
+    state: started
+  when: pgbouncer_conf_changed.changed == True or pgbouncer_auth_changed.changed == True
+  tags:
+    - deploy
+
+- name: PGBouncer | Reload pgbouncer service
+  service:
+    name: pgbouncer
+    state: reloaded
+  when: pgbouncer_conf_changed.changed == True or pgbouncer_auth_changed.changed == True
+  tags:
+    - deploy
