@@ -4,6 +4,8 @@
     repo: 'deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main' 
     state: present
     update_cache: True
+  become: yes
+
 - name: PGBouncer | Install from apt repo
   apt:
     name: pgbouncer
