@@ -71,6 +71,11 @@ admin_users = {{ pgbouncer_admin_users }}
 stats_users = {{ pgbouncer_stats_users }}
 
 ;;;
+;;; SSL Options
+;;;
+server_tls_sslmode={{ pgbouncer_server_tls_sslmode | default('prefer') }}
+
+;;;
 ;;; Pooler personality questions
 ;;;
 
