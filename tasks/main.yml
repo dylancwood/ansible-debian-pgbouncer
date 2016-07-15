@@ -21,26 +21,18 @@
     - postgresql-client
   become: true
 
-- name: PGBouncer | Backup config
-  command: mv {{ pgbouncer_conf_file }} {{ pgbouncer_conf_file }}.bak
-  ignore_errors: yes
-  become: true
-
 - name: PGBouncer | Configure pgbouncer
   template:
     src: ../templates/pgbouncer.ini.j2
     dest: "{{ pgbouncer_conf_file }}"
-  become: true
-
-- name: PGBouncer | Backup auth users file
-  command: mv {{ pgbouncer_auth_file }} {{ pgbouncer_auth_file }}.bak
-  ignore_errors: yes
+    backup: yes
   become: true
 
 - name: PGBouncer | Configure auth_users list
   template:
     src: ../templates/userlist.txt.j2
     dest: "{{ pgbouncer_auth_file }}"
+    backup: yes
   become: true
 
 - name: PGBouncer | Configure pgbouncer to start at boot
