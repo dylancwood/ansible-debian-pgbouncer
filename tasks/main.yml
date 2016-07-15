@@ -51,9 +51,9 @@
   when: pgbouncer_start_on_boot == True
   become: true
 
-- name: PGBouncer | (re)Start pgbouncer service
+- name: PGBouncer | (re)load pgbouncer service
   service:
     name: pgbouncer
-    state: restarted
+    state: reloaded
   become: true
 
