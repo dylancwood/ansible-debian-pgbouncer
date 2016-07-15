@@ -27,6 +27,7 @@
     dest: "{{ pgbouncer_conf_file }}"
     backup: yes
   become: true
+  register: pgbouncer_config
 
 - name: PGBouncer | Configure auth_users list
   template:
@@ -34,6 +35,7 @@
     dest: "{{ pgbouncer_auth_file }}"
     backup: yes
   become: true
+  register: pgbouncer_users
 
 - name: PGBouncer | Configure pgbouncer to start at boot
   replace:
@@ -48,4 +50,5 @@
     name: pgbouncer
     state: reloaded
   become: true
+  when: pgbouncer_config.changed or pgbouncer_users.changed
 
