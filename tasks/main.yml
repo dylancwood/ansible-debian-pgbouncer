@@ -1,32 +1,41 @@
 ---
-- name: PGBouncer | Install from apt repo
-  apt:
-    name: pgbouncer
-    state: installed
+- name: PGBouncer | Install PGDG key
+  apt_key:
+    url: 'https://www.postgresql.org/media/keys/ACCC4CF8.asc'
+    state: present
+  become: true
 
-- name: PGBouncer | Install postgresql-client
-  apt:
-    name: postgresql-client
-    state: installed
-  when: pgbouncer_install_pg_client == True
+- name: PGBouncer | Install PGDG repo
+  apt_repository: 
+    repo: 'deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main' 
+    state: present
+    update_cache: true
+  become: true
 
-- name: PGBouncer | Backup config
-  command: mv {{ pgbouncer_conf_file }} {{ pgbouncer_conf_file }}.bak
-  ignore_errors: yes
+- name: PGBouncer | Install apt dependencies
+  apt:
+    name: "{{item}}"
+    state: latest
+  with_items:
+    - pgbouncer
+    - postgresql-client
+  become: true
 
 - name: PGBouncer | Configure pgbouncer
   template:
     src: ../templates/pgbouncer.ini.j2
     dest: "{{ pgbouncer_conf_file }}"
-
-- name: PGBouncer | Backup auth users file
-  command: mv {{ pgbouncer_auth_file }} {{ pgbouncer_auth_file }}.bak
-  ignore_errors: yes
+    backup: yes
+  become: true
+  register: pgbouncer_config
 
 - name: PGBouncer | Configure auth_users list
   template:
     src: ../templates/userlist.txt.j2
     dest: "{{ pgbouncer_auth_file }}"
+    backup: yes
+  become: true
+  register: pgbouncer_users
 
 - name: PGBouncer | Configure pgbouncer to start at boot
   replace:
@@ -34,9 +43,12 @@
     replace: 'START=1'
     dest: /etc/default/pgbouncer
   when: pgbouncer_start_on_boot == True
+  become: true
 
-- name: PGBouncer | (re)Start pgbouncer service
+- name: PGBouncer | (re)load pgbouncer service
   service:
     name: pgbouncer
-    state: restarted
+    state: reloaded
+  become: true
+  when: pgbouncer_config.changed or pgbouncer_users.changed
 
