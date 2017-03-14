@@ -1,3 +1,8 @@
+pgbouncer_postgresql_apt_key_id: ACCC4CF8
+pgbouncer_postgresql_apt_key_url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+pgbouncer_postgresql_apt_repository: 'deb http://apt.postgresql.org/pub/repos/apt/ {{ansible_distribution_release}}-pgdg main'
+
+pgbouncer_conf_dir: /etc/pgbouncer/conf
 pgbouncer_conf_file: /etc/pgbouncer/pgbouncer.ini
 pgbouncer_install_pg_client: False
 pgbouncer_start_on_boot: True
