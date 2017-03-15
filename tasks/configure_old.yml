@@ -1,0 +1,24 @@
+---
+- name: PGBouncer | Configure pgbouncer
+  template:
+    src: ../templates/pgbouncer.ini.j2
+    dest: "{{ pgbouncer_conf_file }}"
+  register: pgbouncer_conf_changed
+  tags:
+    - deploy
+
+- name: PGBouncer | Configure auth_users list
+  template:
+    src: ../templates/userlist.txt.j2
+    dest: "{{ pgbouncer_auth_file }}"
+  register: pgbouncer_auth_changed
+  tags:
+    - deploy
+
+- name: PGBouncer | Configure pgbouncer to start at boot
+  replace:
+    regexp: '^START=0'
+    replace: 'START=1'
+    dest: /etc/default/pgbouncer
+  when: pgbouncer_start_on_boot == True
+

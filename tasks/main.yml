@@ -1,37 +1,23 @@
 ---
-- name: PGBouncer | Install from apt repo
-  apt:
-    name: pgbouncer
-    state: installed
 
-- name: PGBouncer | Install postgresql-client
-  apt:
-    name: postgresql-client
-    state: installed
-  when: pgbouncer_install_pg_client == True
+- include: install.yml
 
-- name: PGBouncer | Configure pgbouncer
-  template:
-    src: ../templates/pgbouncer.ini.j2
-    dest: "{{ pgbouncer_conf_file }}"
-  register: pgbouncer_conf_changed
+- name: PGBouncer | Check pgbouncer version
+  shell: pgbouncer --version | awk '{print $3}'
+  register: pgbouncer_installed_version
   tags:
     - deploy
 
-- name: PGBouncer | Configure auth_users list
-  template:
-    src: ../templates/userlist.txt.j2
-    dest: "{{ pgbouncer_auth_file }}"
-  register: pgbouncer_auth_changed
+- set_fact:
+    pgbouncer_include_supported: "{{ pgbouncer_installed_version.stdout | version_compare('1.7', operator='ge', strict=True) }}"
   tags:
     - deploy
 
-- name: PGBouncer | Configure pgbouncer to start at boot
-  replace:
-    regexp: '^START=0'
-    replace: 'START=1'
-    dest: /etc/default/pgbouncer
-  when: pgbouncer_start_on_boot == True
+- include: configure_old.yml
+  when: "not {{ pgbouncer_include_supported }}"
+
+- include: configure_new.yml
+  when: "{{ pgbouncer_include_supported }}"
 
 - name: PGBouncer | (re)Start pgbouncer service
   service:
@@ -42,7 +28,7 @@
   service:
     name: pgbouncer
     state: started
-  when: pgbouncer_conf_changed.changed == True or pgbouncer_auth_changed.changed == True
+  when: pgbouncer_conf_changed.changed == True or pgbouncer_auth_changed.changed == True or pgbouncer_auth_users_results.changed == True
   tags:
     - deploy
 
@@ -50,6 +36,6 @@
   service:
     name: pgbouncer
     state: reloaded
-  when: pgbouncer_conf_changed.changed == True or pgbouncer_auth_changed.changed == True
+  when: pgbouncer_conf_changed.changed == True or pgbouncer_auth_changed.changed == True or pgbouncer_auth_users_results.changed == True
   tags:
     - deploy

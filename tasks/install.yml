@@ -1,0 +1,26 @@
+---
+
+
+- name: PostgreSQL | Add PostgreSQL repository apt-key
+  apt_key:
+    id: "{{ pgbouncer_postgresql_apt_key_id }}"
+    url: "{{ pgbouncer_postgresql_apt_key_url }}"
+    state: present
+  when: pgbouncer_postgresql_apt_key_url and pgbouncer_postgresql_apt_key_id
+
+- name: PostgreSQL | Add PostgreSQL repository
+  apt_repository:
+    repo: "{{ pgbouncer_postgresql_apt_repository }}"
+    state: present
+  when: pgbouncer_postgresql_apt_repository | default('') != ''
+
+- name: PGBouncer | Install from apt repo
+  apt:
+    name: pgbouncer
+    state: installed
+
+- name: PGBouncer | Install postgresql-client
+  apt:
+    name: postgresql-client
+    state: installed
+  when: pgbouncer_install_pg_client == True
