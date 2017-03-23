@@ -19,16 +19,10 @@
 - include: configure_new.yml
   when: "{{ pgbouncer_include_supported }}"
 
-- name: PGBouncer | (re)Start pgbouncer service
-  service:
-    name: pgbouncer
-    state: restarted
-
 - name: PGBouncer | Start pgbouncer service
   service:
     name: pgbouncer
     state: started
-  when: pgbouncer_conf_changed.changed == True or pgbouncer_auth_changed.changed == True or pgbouncer_auth_users_results.changed == True
   tags:
     - deploy
 
