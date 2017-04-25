@@ -1,0 +1,69 @@
+---
+- name: PGBouncer | Create database conf directory
+  file:
+    path: "{{ pgbouncer_conf_dir }}"
+    state: directory
+    recurse: yes
+
+- name: PGBouncer | Create auth file
+  copy:
+    dest: "{{ pgbouncer_auth_file }}"
+    content: ""
+    force: no
+
+- name: PGBouncer | Configure database conf
+  template:
+    src: "database.ini.j2"
+    dest: "{{ pgbouncer_conf_dir }}/{{ item.name }}.ini"
+  with_items: "{{ pgbouncer_database_aliases | default([]) }}"
+  tags:
+    - deploy
+
+- name: PGBouncer | get conf file list
+  command: ls "{{ pgbouncer_conf_dir }}"
+  register: pgbouncer_database_conf_list
+  tags:
+    - deploy
+
+- set_fact:
+    pgbouncer_database_conf_list: "{{ pgbouncer_database_conf_list.stdout_lines }}"
+  tags:
+    - deploy
+
+- name: PGBouncer | Configure pgbouncer
+  template:
+    src: "pgbouncer.ini.j2"
+    dest: "{{ pgbouncer_conf_file }}"
+  register: pgbouncer_conf_changed
+  tags:
+    - deploy
+
+- name: PGBouncer | configure auth_users list
+  replace:
+    destfile: "{{ pgbouncer_auth_file }}"
+    regexp: '^"{{item.name}}".*$'
+    replace: '"{{ item.name }}" "{{ item.pass }}"'
+  with_items: "{{ pgbouncer_auth_users | default([]) }}"
+  register: pgbouncer_auth_users_results
+  tags:
+    - deploy
+
+- name: PGBouncer | configure remaining auth_users list
+  lineinfile:
+    destfile: "{{ pgbouncer_auth_file }}"
+    regexp: '^"{{item.item.name}}".*$'
+    line: '"{{ item.item.name }}" "{{ item.item.pass }}"'
+    state: "present"
+  when: "not {{ item.changed }}"
+  with_items: "{{ pgbouncer_auth_users_results.results | default([]) }}"
+  register: pgbouncer_auth_changed
+  tags:
+    - deploy
+
+- name: PGBouncer | Configure pgbouncer to start at boot
+  replace:
+    regexp: '^START=0'
+    replace: 'START=1'
+    dest: /etc/default/pgbouncer
+  when: pgbouncer_start_on_boot == True
+
