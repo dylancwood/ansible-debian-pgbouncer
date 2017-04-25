@@ -22,3 +22,5 @@
     dest: /etc/default/pgbouncer
   when: pgbouncer_start_on_boot == True
 
+- set_fact:
+  pgbouncer_auth_users_results: pgbouncer_auth_changed
