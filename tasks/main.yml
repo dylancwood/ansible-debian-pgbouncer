@@ -3,6 +3,7 @@
   apt:
     name: pgbouncer
     state: installed
+  ignore_errors: yes
 
 - name: PGBouncer | Install postgresql-client
   apt:
