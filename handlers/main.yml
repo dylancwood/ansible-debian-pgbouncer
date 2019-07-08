@@ -1,2 +1,12 @@
 ---
-# handlers file for .
+# Soft for running connections
+- name: reload pgbouncer
+  service:
+    name: pgbouncer
+    state: reloaded
+
+# Hard for running connections
+- name: restart pgbouncer
+  service:
+    name: pgbouncer
+    state: restarted

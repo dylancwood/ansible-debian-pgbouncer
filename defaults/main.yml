@@ -60,3 +60,4 @@ pgbouncer_database_aliases:
     datastyle: ''
     connect_query: ''
     auth_user: postgres #not supported until pgbouncer 1.5.5, and 1.5.4 is installed by default :-(
+pgbouncer_service_state: reload
