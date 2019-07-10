@@ -4,6 +4,7 @@
     name: pgbouncer
     state: "{{ pgbouncer_install_state }}"
   notify: "{{ pgbouncer_service_state }} pgbouncer"
+  register: install_pgbouncer
 
 - name: PGBouncer | Install postgresql-client
   apt:
@@ -34,3 +35,9 @@
   service:
     name: pgbouncer
     state: started
+
+- name: PGBouncer | restart pgbouncer on install
+  service:
+    name: pgbouncer
+    state: restarted
+  when: install_pgbouncer.changed
