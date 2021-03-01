@@ -9,7 +9,7 @@
 - name: PGBouncer | Install postgresql-client
   apt:
     name: postgresql-client
-    state: installed
+    state: present
   when: pgbouncer_install_pg_client == True
 
 - name: PGBouncer | Configure pgbouncer
