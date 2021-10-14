@@ -235,3 +235,10 @@ dns_max_ttl = {{ pgbouncer_dns_max_ttl }}
 ;; DNS zone SOA lookup period
 ;dns_zone_check_period = 0
 dns_zone_check_period = {{ pgbouncer_dns_zone_check_period }}
+
+{% if pgbouncer_users_aliases is defined %}
+[users]
+{% for item in pgbouncer_users_aliases %}
+{{ item.name }} = {% if item.max_user_connections is defined %} max_user_connections={{ item.max_user_connections }} {% endif %}
+{% endfor %}
+{% endif %}
