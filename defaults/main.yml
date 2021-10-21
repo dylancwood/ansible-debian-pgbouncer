@@ -36,6 +36,7 @@ pgbouncer_query_wait_timeout: 0
 pgbouncer_client_idle_timeout: 0
 pgbouncer_client_login_timeout: 60
 pgbouncer_autodb_idle_timeout: 3600
+pgbouncer_idle_transaction_timeout: 0
 pgbouncer_pkt_buf: 2048
 pgbouncer_listen_backlog: 128
 pgbouncer_tcp_defer_accept: 0

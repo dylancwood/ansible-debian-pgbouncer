@@ -186,6 +186,11 @@ client_login_timeout = {{ pgbouncer_client_login_timeout }}
 ;; stay unused in this many seconds.
 autodb_idle_timeout = {{ pgbouncer_autodb_idle_timeout }}
 
+
+;; Close connections which are in "IDLE in transaction" state longer
+;; than this many seconds.
+idle_transaction_timeout = {{ pgbouncer_idle_transaction_timeout }}
+
 ;;;
 ;;; Low-level tuning options
 ;;;
