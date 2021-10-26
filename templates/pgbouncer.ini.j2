@@ -239,6 +239,7 @@ dns_zone_check_period = {{ pgbouncer_dns_zone_check_period }}
 {% if pgbouncer_users_aliases is defined %}
 [users]
 {% for item in pgbouncer_users_aliases %}
-{{ item.name }} = {% if item.pool_mode is defined %}pool_mode={{ item.pool_mode }}{% endif %}{% if item.max_user_connections is defined %}max_user_connections={{ item.max_user_connections }}{% endif %}
+{{ item.name }} = {% if item.pool_mode is defined %}pool_mode={{ item.pool_mode }}{% endif %} {% if item.max_user_connections is defined %}max_user_connections={{ item.max_user_connections }}
+{% endif %}
 {% endfor %}
 {% endif %}
