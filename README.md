@@ -26,6 +26,14 @@ The above will result in a userlist.txt file that looks like this:
 "postgres" "pa55word"
 ```
 
+### pgbouncer_users_aliases
+This is a list of dict objects wich each have a **name** and *max_user_connections* property. Allow you to configure pool connections per users.
+```yml
+pgbouncer_users_aliases:
+  - name: backyard
+    max_user_connections: 30
+```
+
 Dependencies
 ------------
 

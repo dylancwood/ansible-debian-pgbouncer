@@ -130,8 +130,8 @@ reserve_pool_size = {{ pgbouncer_reserve_pool_size }}
 reserve_pool_timeout = {{ pgbouncer_reserve_pool_timeout }}
 
 ; how many total connections to a single database to allow from all pools
-max_db_connections = {{ pgbouncer_max_db_connections }}
-max_user_connections = {{ pgbouncer_max_user_connections }}
+{% if not pgbouncer_max_db_connections %};{% endif %}max_db_connections = {{ pgbouncer_max_db_connections }}
+{% if not pgbouncer_max_user_connections %};{% endif %}max_user_connections = {{ pgbouncer_max_user_connections }}
 
 ; log if client connects or server connection is made
 log_connections = {{ pgbouncer_log_connections }}
@@ -186,6 +186,11 @@ client_login_timeout = {{ pgbouncer_client_login_timeout }}
 ;; stay unused in this many seconds.
 autodb_idle_timeout = {{ pgbouncer_autodb_idle_timeout }}
 
+
+;; Close connections which are in "IDLE in transaction" state longer
+;; than this many seconds.
+idle_transaction_timeout = {{ pgbouncer_idle_transaction_timeout }}
+
 ;;;
 ;;; Low-level tuning options
 ;;;
@@ -235,3 +240,11 @@ dns_max_ttl = {{ pgbouncer_dns_max_ttl }}
 ;; DNS zone SOA lookup period
 ;dns_zone_check_period = 0
 dns_zone_check_period = {{ pgbouncer_dns_zone_check_period }}
+
+{% if pgbouncer_users_aliases is defined %}
+[users]
+{% for item in pgbouncer_users_aliases %}
+{{ item.name }} = {% if item.pool_mode is defined %}pool_mode={{ item.pool_mode }}{% endif %} {% if item.max_user_connections is defined %}max_user_connections={{ item.max_user_connections }}
+{% endif %}
+{% endfor %}
+{% endif %}
