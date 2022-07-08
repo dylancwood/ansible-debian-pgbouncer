@@ -1,0 +1,3 @@
+[Unit]
+Before=runlevel2.target runlevel3.target runlevel4.target runlevel5.target shutdown.target
+After=local-fs.target remote-fs.target network-online.target systemd-journald-dev-log.socket nss-lookup.target postgresql.service

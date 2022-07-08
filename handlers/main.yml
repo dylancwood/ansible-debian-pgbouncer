@@ -10,3 +10,8 @@
   service:
     name: pgbouncer
     state: restarted
+
+# Hard for running connections
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
